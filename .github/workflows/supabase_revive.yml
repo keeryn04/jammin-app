@@ -1,0 +1,23 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    #Runs every 24 hours
+    - cron: "0 */24 * * *"
+  workflow_dispatch: 
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Health Endpoint
+        run: |
+          echo "Pinging Supabase..."
+          curl -s -o response.txt -w "%{http_code}\n" \
+            -H "apikey: $SUPABASE_SERVICE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+            "$SUPABASE_URI/auth/v1/health"
+          cat response.txt
+        env:
+          SUPABASE_URI: ${{ secrets.SUPABASE_URI }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
